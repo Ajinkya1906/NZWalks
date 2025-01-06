@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
+using System.Runtime.CompilerServices;
 
 namespace NZWalks.API.Controllers
 {
@@ -50,22 +51,62 @@ namespace NZWalks.API.Controllers
 
         //Get by Id
         //GET: /api/Walks/{id}
-        [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] Guid Id)
-        {
-            var walkDomainModel = await walkRepository.GetByIdAsync(Id);
+        //[HttpGet]
+        //[Route("{id:Guid}")]
 
-            if(walkDomainModel == null)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id)
+        {
+            var walkDomainModel = await walkRepository.GetByIdAsync(id);
+
+            if (walkDomainModel == null)
             {
                 return NotFound();
             }
 
-            //Map domain model to DTO
+            return Ok(mapper.Map<WalkDto>(walkDomainModel));
+        }
+
+        //Update walk by Id
+        //put /api/Walks/{id}
+        //[HttpPut]
+        //[Route("{id:Guid}")]
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, UpdateWalkRequestDto updateWalkRequestDto)
+        {
+            //Map DTO to domain model
+            var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
+
+             walkDomainModel = await walkRepository.UpdateAsync(id,walkDomainModel);
+        
+            if (walkDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            //Map Domain Model to DTO
             return Ok(mapper.Map<WalkDto>(walkDomainModel));
         }
 
 
-    
+        //Delete walk by Id
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var deleteWalkDomainModel = await walkRepository.DeleteAsync(id);
+
+            if(deleteWalkDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            //Map Domain Model to Dto
+            return Ok(mapper.Map<WalkDto>(deleteWalkDomainModel));
+        }
+
+
     }
 }
+

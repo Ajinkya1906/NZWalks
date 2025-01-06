@@ -28,6 +28,8 @@ namespace NZWalks.API.Mapping
             //Walk-domain model,
 
             CreateMap<Difficulty,DifficultyDto>().ReverseMap();
+
+            CreateMap<UpdateWalkRequestDto,Walk>().ReverseMap();
         }
     }
 }
